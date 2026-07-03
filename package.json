@@ -1,0 +1,25 @@
+{
+  "name": "gitpilot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magnificentthrush/gitPilot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/magnificentthrush/gitPilot/issues"
+  },
+  "homepage": "https://github.com/magnificentthrush/gitPilot#readme",
+  "devDependencies": {
+    "electron": "^43.0.0"
+  }
+}
