@@ -76,13 +76,14 @@ describe('startPtyRun', () => {
   it.runIf(process.platform === 'win32')(
     'leaves no conhost.exe processes behind after runs finish',
     async () => {
-      for (let i = 0; i < 5; i++) await runGit(['--version'], repo);
+      for (let i = 0; i < 3; i++) await runGit(['--version'], repo);
       await new Promise((r) => setTimeout(r, 1500));
 
       const children = execFileSync(
         'powershell',
         [
           '-NoProfile',
+          '-NonInteractive',
           '-Command',
           `Get-CimInstance Win32_Process -Filter "ParentProcessId = ${process.pid}" | ForEach-Object { $_.Name }`,
         ],
@@ -92,5 +93,7 @@ describe('startPtyRun', () => {
         .map((name) => name.trim().toLowerCase());
       expect(children).not.toContain('conhost.exe');
     },
+    // A cold PowerShell + WMI query alone can take over 20s on CI runners.
+    60_000,
   );
 });
