@@ -8,16 +8,16 @@ GitPilot is a desktop app for learning Git by using it. Students type real Git c
 
 ## 1. Product decisions (locked)
 
-| # | Decision | Resolution |
-|---|---|---|
-| 1 | Platform | **Electron desktop app** with a real terminal (xterm.js + node-pty) next to state and guidance panels. Integrating with the student's own shell is a possible future feature. |
-| 2 | Non-Git commands | A small allowlist of **built-in file commands**, implemented in Node so they behave the same on Windows/macOS/Linux. Students edit files in their own editor, and GitPilot watches for changes. No general shell. |
-| 3 | Interactive commands | Git runs inside a **PTY**. The pager is disabled. `GIT_EDITOR` points to a GitPilot shim that opens an in-app message editor. |
-| 4 | Safety | Commands are classified by **subcommand plus arguments**. Destructive commands need confirmation and get an **automatic undo snapshot** first. |
-| 5 | Practice | **Sandbox repositories** are a core feature from day one: temporary repos generated from scenario scripts. |
-| 6 | Assistance | **Rule-based** in v1, with all facts coming from Git. AI comes later as an optional explanation layer, off by default, using the student's own key. |
-| 7 | Command entry | GitPilot owns the prompt (a command bar). Shell integration may come later. |
-| 8 | Learning model | Free-form companion first. Guided exercises come later and reuse the same sandbox and state engine. |
+| #   | Decision             | Resolution                                                                                                                                                                                                        |
+| --- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Platform             | **Electron desktop app** with a real terminal (xterm.js + node-pty) next to state and guidance panels. Integrating with the student's own shell is a possible future feature.                                     |
+| 2   | Non-Git commands     | A small allowlist of **built-in file commands**, implemented in Node so they behave the same on Windows/macOS/Linux. Students edit files in their own editor, and GitPilot watches for changes. No general shell. |
+| 3   | Interactive commands | Git runs inside a **PTY**. The pager is disabled. `GIT_EDITOR` points to a GitPilot shim that opens an in-app message editor.                                                                                     |
+| 4   | Safety               | Commands are classified by **subcommand plus arguments**. Destructive commands need confirmation and get an **automatic undo snapshot** first.                                                                    |
+| 5   | Practice             | **Sandbox repositories** are a core feature from day one: temporary repos generated from scenario scripts.                                                                                                        |
+| 6   | Assistance           | **Rule-based** in v1, with all facts coming from Git. AI comes later as an optional explanation layer, off by default, using the student's own key.                                                               |
+| 7   | Command entry        | GitPilot owns the prompt (a command bar). Shell integration may come later.                                                                                                                                       |
+| 8   | Learning model       | Free-form companion first. Guided exercises come later and reuse the same sandbox and state engine.                                                                                                               |
 
 **Guiding principles**
 
@@ -68,7 +68,7 @@ GitPilot is a desktop app for learning Git by using it. Students type real Git c
 - **State panel** always shows the four areas: working tree, staging area, commits, and remote.
 - **Guidance panel** shows what happened, what to do next, and "Explain" for each one.
 - **Graph tab** draws the commit graph from real refs.
-- **Assistance level** setting: *Quiet* (completion only), *Standard* (default), or *Detailed*.
+- **Assistance level** setting: _Quiet_ (completion only), _Standard_ (default), or _Detailed_.
 
 ### Core loop
 
@@ -119,22 +119,22 @@ All Git and file-system access happens in the main process. The renderer only se
 
 **Accepted commands**
 
-| Kind | Commands |
-|---|---|
-| Git | `git <subcommand> …`, checked against the classifier |
+| Kind                   | Commands                                                                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Git                    | `git <subcommand> …`, checked against the classifier                                                                                                |
 | Built-in file commands | `ls`, `cat`, `pwd`, `cd` (only inside the current repo or sandbox), `mkdir`, `touch`, `echo … > / >> file`, `edit <file>` (opens the system editor) |
-| GitPilot commands | `help`, `explain <command or concept>`, `undo`, `clear`, `sandbox <scenario>`, `open <path>` |
+| GitPilot commands      | `help`, `explain <command or concept>`, `undo`, `clear`, `sandbox <scenario>`, `open <path>`                                                        |
 
 Built-ins are written in Node, so `touch` and `ls` work the same on Windows.
 
 **Classifier.** A rule table keyed by subcommand and argument patterns:
 
-| Tier | Examples | Behaviour |
-|---|---|---|
-| `read` | `status`, `log`, `diff`, `show`, `branch` (list), `remote -v` | Runs immediately |
-| `change` | `add`, `commit`, `switch`, `merge`, `branch <new>`, `stash push`, `fetch` | Runs on Enter |
-| `destructive` | `reset --hard`, `restore <path>`, `checkout -- <path>`, `checkout .`, `clean -f`, `branch -D`, `stash drop/clear`, `rebase`, `commit --amend` (when the commit has already been pushed), `push --force` | Confirmation + undo snapshot |
-| `blocked` (v1) | `filter-branch`, `gc --prune=now`, `reflog expire`, `update-ref -d` on non-GitPilot refs, `config --global` | Explanation shown; not run |
+| Tier           | Examples                                                                                                                                                                                                | Behaviour                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `read`         | `status`, `log`, `diff`, `show`, `branch` (list), `remote -v`                                                                                                                                           | Runs immediately             |
+| `change`       | `add`, `commit`, `switch`, `merge`, `branch <new>`, `stash push`, `fetch`                                                                                                                               | Runs on Enter                |
+| `destructive`  | `reset --hard`, `restore <path>`, `checkout -- <path>`, `checkout .`, `clean -f`, `branch -D`, `stash drop/clear`, `rebase`, `commit --amend` (when the commit has already been pushed), `push --force` | Confirmation + undo snapshot |
+| `blocked` (v1) | `filter-branch`, `gc --prune=now`, `reflog expire`, `update-ref -d` on non-GitPilot refs, `config --global`                                                                                             | Explanation shown; not run   |
 
 Unknown subcommands or flags fall back to `change`, with a note saying GitPilot doesn't know this command well.
 
@@ -151,27 +151,29 @@ Unknown subcommands or flags fall back to `change`, with a note saying GitPilot 
 
 `RepoInspector.snapshot(dir): RepoState` uses machine-readable plumbing commands, all run with `--no-optional-locks` so they never fight the student's commands over `index.lock`:
 
-| Data | Source |
-|---|---|
-| Branch, upstream, ahead/behind, file states | `git status --porcelain=v2 --branch -z --untracked-files=all` |
-| HEAD and detached state | `git symbolic-ref -q HEAD`, `git rev-parse HEAD` |
-| Branches/tags with tips | `git for-each-ref --format=…` |
-| Recent commits + graph | `git log --all --format=%H%x00%P%x00%D%x00%s -n N` |
-| In-progress operation | presence of `MERGE_HEAD`, `rebase-merge/`, `rebase-apply/`, `CHERRY_PICK_HEAD`, `REVERT_HEAD` (via `git rev-parse --git-path`) |
-| Conflicted files | porcelain v2 `u` entries |
-| Stashes | `git stash list --format=…` |
-| Last ref action | `git reflog -1 --format=%gs` (e.g. `merge feature: Fast-forward`) |
-| Remotes | `git remote -v` |
-| Environment | `git --version`, `init.defaultBranch`, `user.name` / `user.email` set? |
+| Data                                        | Source                                                                                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Branch, upstream, ahead/behind, file states | `git status --porcelain=v2 --branch -z --untracked-files=all`                                                                  |
+| HEAD and detached state                     | `git symbolic-ref -q HEAD`, `git rev-parse HEAD`                                                                               |
+| Branches/tags with tips                     | `git for-each-ref --format=…`                                                                                                  |
+| Recent commits + graph                      | `git log --all --format=%H%x00%P%x00%D%x00%s -n N`                                                                             |
+| In-progress operation                       | presence of `MERGE_HEAD`, `rebase-merge/`, `rebase-apply/`, `CHERRY_PICK_HEAD`, `REVERT_HEAD` (via `git rev-parse --git-path`) |
+| Conflicted files                            | porcelain v2 `u` entries                                                                                                       |
+| Stashes                                     | `git stash list --format=…`                                                                                                    |
+| Last ref action                             | `git reflog -1 --format=%gs` (e.g. `merge feature: Fast-forward`)                                                              |
+| Remotes                                     | `git remote -v`                                                                                                                |
+| Environment                                 | `git --version`, `init.defaultBranch`, `user.name` / `user.email` set?                                                         |
 
 ```ts
 interface RepoState {
   isRepo: boolean;
   head: { kind: 'branch'; name: string; oid: string | null } | { kind: 'detached'; oid: string };
   upstream?: { name: string; ahead: number; behind: number };
-  files: FileEntry[];            // path, index status, worktree status, untracked, conflicted
-  branches: Ref[]; tags: Ref[]; remotes: Remote[];
-  commits: CommitNode[];         // for the graph (bounded)
+  files: FileEntry[]; // path, index status, worktree status, untracked, conflicted
+  branches: Ref[];
+  tags: Ref[];
+  remotes: Remote[];
+  commits: CommitNode[]; // for the graph (bounded)
   operation: 'none' | 'merge' | 'rebase' | 'cherry-pick' | 'revert';
   stashes: Stash[];
   lastReflog?: string;
@@ -203,7 +205,7 @@ Fast-forward vs. merge commit is decided from refs and parents, using the reflog
 interface Rule {
   id: string;
   when: (s: RepoState, e: GitEvent[]) => boolean;
-  suggest: (s: RepoState, e: GitEvent[]) => Suggestion[];  // command + why + conceptId
+  suggest: (s: RepoState, e: GitEvent[]) => Suggestion[]; // command + why + conceptId
   priority: number;
 }
 ```
@@ -239,7 +241,7 @@ Before any `destructive` command runs, GitPilot creates an **undo snapshot**:
 
 The `undo` command restores the branch tip, the index and the working tree from the latest snapshot. It's also shown as a button after a destructive command.
 
-The confirmation dialog explains exactly what *this* command will do in *this* state. For example, "2 modified files and 1 untracked file will be lost" means the files are listed by name.
+The confirmation dialog explains exactly what _this_ command will do in _this_ state. For example, "2 modified files and 1 untracked file will be lost" means the files are listed by name.
 
 **Limitations shown to students:**
 
@@ -289,18 +291,18 @@ An `Explainer` interface with a rule/content implementation (v1) and an optional
 
 ## 5. Technology
 
-| Area | Choice |
-|---|---|
-| Language | TypeScript (strict) everywhere |
-| App shell | Electron (already in the repo), using the electron-vite or Electron Forge + Vite template |
-| UI | React in the renderer |
-| Terminal | `@xterm/xterm` + `@xterm/addon-fit` |
-| PTY | `node-pty`, rebuilt for Electron with `@electron/rebuild` |
-| File watching | `chokidar` |
-| Tests | Vitest (unit), plus integration tests against real temporary Git repos |
-| Lint/format | ESLint + Prettier |
-| Packaging | Electron Forge makers, starting with a Windows installer |
-| Requirements | Git installed by the user. GitPilot detects it at startup and explains how to install it if it's missing. Minimum Git **2.23** (for `switch`/`restore`), with a recommended version shown. |
+| Area          | Choice                                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Language      | TypeScript (strict) everywhere                                                                                                                                                             |
+| App shell     | Electron (already in the repo), using the electron-vite or Electron Forge + Vite template                                                                                                  |
+| UI            | React in the renderer                                                                                                                                                                      |
+| Terminal      | `@xterm/xterm` + `@xterm/addon-fit`                                                                                                                                                        |
+| PTY           | `node-pty`, rebuilt for Electron with `@electron/rebuild`                                                                                                                                  |
+| File watching | `chokidar`                                                                                                                                                                                 |
+| Tests         | Vitest (unit), plus integration tests against real temporary Git repos                                                                                                                     |
+| Lint/format   | ESLint + Prettier                                                                                                                                                                          |
+| Packaging     | Electron Forge makers, starting with a Windows installer                                                                                                                                   |
+| Requirements  | Git installed by the user. GitPilot detects it at startup and explains how to install it if it's missing. Minimum Git **2.23** (for `switch`/`restore`), with a recommended version shown. |
 
 ---
 
@@ -333,17 +335,17 @@ docs/          PLAN.md
 
 Each milestone ends with something you can demo.
 
-| # | Milestone | Done when |
-|---|---|---|
-| **M0** | Foundation | TypeScript + Vite + React build, lint, Vitest, CI, secure preload, empty 3-panel layout |
-| **M1** | Command execution | Command bar → parser → executor. Git runs in a PTY with colours. Pager off. Editor shim works for `git commit` without `-m`. Built-in file commands work on Windows. |
-| **M2** | Repository state | `RepoInspector` + state panel. Watcher picks up outside edits. Git presence and version checks. Identity-missing banner. |
-| **M3** | What happened + next steps | Event detector and ~25 rules covering init → add → commit → branch → switch → merge (ff / merge commit / conflict). Content for the core concepts. |
-| **M4** | Error interpreter | The top ~20 errors with Hint/Guidance/Solution levels |
-| **M5** | Safety | Classifier tiers, a confirmation dialog listing the affected files, undo snapshots + `undo` |
-| **M6** | Completion | Spec-driven completion with live refs/paths and side-by-side comparisons of similar commands |
-| **M7** | Sandbox + graph | 7 scenarios, sandbox switcher, accurate commit graph view (including unreachable commits after a reset, via reflog) |
-| **M8** | MVP release | Progress panel, assistance levels, Windows installer, first-run onboarding |
+| #      | Milestone                  | Done when                                                                                                                                                            |
+| ------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **M0** | Foundation                 | TypeScript + Vite + React build, lint, Vitest, CI, secure preload, empty 3-panel layout                                                                              |
+| **M1** | Command execution          | Command bar → parser → executor. Git runs in a PTY with colours. Pager off. Editor shim works for `git commit` without `-m`. Built-in file commands work on Windows. |
+| **M2** | Repository state           | `RepoInspector` + state panel. Watcher picks up outside edits. Git presence and version checks. Identity-missing banner.                                             |
+| **M3** | What happened + next steps | Event detector and ~25 rules covering init → add → commit → branch → switch → merge (ff / merge commit / conflict). Content for the core concepts.                   |
+| **M4** | Error interpreter          | The top ~20 errors with Hint/Guidance/Solution levels                                                                                                                |
+| **M5** | Safety                     | Classifier tiers, a confirmation dialog listing the affected files, undo snapshots + `undo`                                                                          |
+| **M6** | Completion                 | Spec-driven completion with live refs/paths and side-by-side comparisons of similar commands                                                                         |
+| **M7** | Sandbox + graph            | 7 scenarios, sandbox switcher, accurate commit graph view (including unreachable commits after a reset, via reflog)                                                  |
+| **M8** | MVP release                | Progress panel, assistance levels, Windows installer, first-run onboarding                                                                                           |
 
 **MVP acceptance test:** a new student starts the `empty` sandbox, makes commits, creates a feature branch, merges it, resolves a conflict in `merge-conflict`, and recovers from a `reset --hard` using `undo` and the reflog. They do all of this without leaving GitPilot except to edit files, and without hitting an unexplained error.
 
@@ -362,12 +364,25 @@ Each milestone ends with something you can demo.
 
 ## 9. Risks and open questions
 
-| Risk / question | Mitigation / next step |
-|---|---|
-| node-pty native build problems on Windows | Spike it in M0. Pin Electron and node-pty versions. Use `@electron/rebuild` in CI. |
-| Git messages vary between versions and locales | Use state, not text, wherever possible. Force `LC_ALL=C`. Keep golden tests across versions. |
-| Students run destructive commands on real projects | Undo snapshots, clear sandbox/project indicator, sandbox suggested by default |
-| Too much guidance becomes noise | Assistance levels, short summaries first, "don't show this again" per rule |
-| Credential prompts on push (Git Credential Manager GUI on Windows) | They work through the PTY. Handled in the remotes milestone, after the MVP. |
-| **Open:** are instructors a target audience? | Decide before designing the exercise format |
-| **Open:** product name | "GitPilot" is a working title. Check for name conflicts before release. |
+| Risk / question                                                    | Mitigation / next step                                                                        |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| node-pty native build problems on Windows                          | Resolved in M0, see §10. node-pty uses N-API prebuilds, so no rebuild for Electron is needed. |
+| Git messages vary between versions and locales                     | Use state, not text, wherever possible. Force `LC_ALL=C`. Keep golden tests across versions.  |
+| Students run destructive commands on real projects                 | Undo snapshots, clear sandbox/project indicator, sandbox suggested by default                 |
+| Too much guidance becomes noise                                    | Assistance levels, short summaries first, "don't show this again" per rule                    |
+| Credential prompts on push (Git Credential Manager GUI on Windows) | They work through the PTY. Handled in the remotes milestone, after the MVP.                   |
+| **Open:** are instructors a target audience?                       | Decide before designing the exercise format                                                   |
+| **Open:** product name                                             | "GitPilot" is a working title. Check for name conflicts before release.                       |
+
+---
+
+## 10. M0 spike findings (node-pty on Windows)
+
+Tested with node-pty 1.1.0, Electron 43 and Git 2.50 on Windows 11.
+
+- **Loads in Electron without a rebuild.** node-pty 1.1.0 ships N-API prebuilds for win32/darwin, so `@electron/rebuild` isn't needed. Linux compiles it with node-gyp at install time.
+- **Needs `git.exe`, not `git`.** On Windows, node-pty doesn't search PATH for a bare name and fails with "File not found". See `gitExecutable()`.
+- **Leaks without extra cleanup.** After the child exits, node-pty keeps the ConPTY input pipe and a worker thread open, leaving one `conhost.exe` per run. Its public `kill()` doesn't fix this, and it forks a helper that fails and may later kill a reused PID. `startPtyRun()` closes the two internal handles instead. Because those are private fields, node-pty is pinned to an exact version, and an integration test fails if `conhost.exe` processes are left behind.
+- **Raw PTY output isn't parseable text.** ConPTY inserts control sequences in the middle of output (it sets the window title after the first character). This confirms "state over text": the error interpreter should match stderr from a separate non-PTY capture or from state, never raw PTY output.
+- **Ctrl+C reports exit code 0.** Interrupting `git cat-file --batch-check` with `\x03` ends it, but the exit code is 0. The pipeline must track interruptions itself rather than infer them from exit codes. Real failures do report non-zero codes.
+- **Typed input works.** Keystrokes written to the PTY reach Git, so interactive commands are feasible in M1.
