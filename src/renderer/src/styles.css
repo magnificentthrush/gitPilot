@@ -1,0 +1,177 @@
+:root {
+  --bg: #14161a;
+  --panel: #1b1e24;
+  --border: #2a2e37;
+  --text: #d8dbe2;
+  --muted: #8b919e;
+  --accent: #6aa9ff;
+  --font-ui: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, 'SF Mono', Menlo, monospace;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.app {
+  display: grid;
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'header header'
+    'terminal side-top'
+    'command side-bottom';
+}
+
+.app-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+.app-header h1 {
+  font-size: 14px;
+}
+
+.app-header .muted {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.terminal-pane {
+  grid-area: terminal;
+  min-height: 0;
+  padding: 8px 0 0 10px;
+}
+
+.terminal-view {
+  height: 100%;
+}
+
+.side-top {
+  grid-area: side-top;
+  border-left: 1px solid var(--border);
+  overflow: auto;
+}
+
+.side-bottom {
+  grid-area: side-bottom;
+  border-left: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+}
+
+.command-pane {
+  grid-area: command;
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+}
+
+.panel {
+  padding: 12px 14px;
+}
+
+.panel h2 {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.panel p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.state-area {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.state-area h3 {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.command-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.command-bar:focus-within {
+  border-color: var(--accent);
+}
+
+.prompt {
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.command-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.command-input:disabled {
+  cursor: default;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+}

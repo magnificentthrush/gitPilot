@@ -22,3 +22,6 @@ Thumbs.db
 # IDE/editor
 .vscode/
 .idea/
+
+# electron-vite output
+out/
